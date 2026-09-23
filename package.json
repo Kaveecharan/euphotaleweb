@@ -1,0 +1,27 @@
+{
+  "name": "euphotale-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Marketing site for EuphoTale — a static Next.js export.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "overrides": {
+    "postcss": "^8.5.26",
+    "sharp": "^0.35.4"
+  },
+  "dependencies": {
+    "next": "15.5.25",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^3.4.17"
+  }
+}

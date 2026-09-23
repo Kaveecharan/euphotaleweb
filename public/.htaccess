@@ -1,0 +1,175 @@
+# ═════════════════════════════════════════════════════════════════════════════
+#  EuphoTale — Apache configuration for shared (Apache) webhosting.
+#
+#  This file is copied into out/ by the static export and uploaded to the site
+#  webroot. It is the ONLY place security headers can live: `headers()` in
+#  next.config.mjs runs in a Node server, and a static export does not have one.
+#
+#  Changing the site's network behaviour — adding an API call, an embedded
+#  video, an analytics script — means changing the Content-Security-Policy
+#  below. If it is not listed here, the browser will refuse it.
+# ═════════════════════════════════════════════════════════════════════════════
+
+# ── Never list a directory, never negotiate a filename ───────────────────────
+#
+# -MultiViews matters as much as -Indexes here and is easier to miss. With
+# MultiViews on, Apache answers /about by negotiating a file it thinks is close
+# enough — /about.html — which serves the page at a URL the canonical tag, the
+# sitemap and trailingSlash: true all disagree with, and lets a request guess at
+# filenames that were never meant to be reachable. This export addresses every
+# page as a directory containing index.html; nothing here needs negotiating.
+#
+# `ServerSignature Off` used to sit here and has been removed on purpose. The
+# host (IONOS Deploy Now) documents mod_rewrite, mod_headers, mod_deflate,
+# mod_mime, Options and FilesMatch as supported and does NOT list
+# ServerSignature — and a directive a shared host disallows does not degrade,
+# it makes Apache answer 500 to EVERY request. With -Indexes below there is no
+# generated listing for a signature to appear in, so it was buying nothing for
+# the chance of taking the site down.
+Options -Indexes -MultiViews
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # ── Force HTTPS ────────────────────────────────────────────────────────────
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # ── Refuse dotfiles, source maps and stray build artefacts ─────────────────
+  #
+  # Done with mod_rewrite rather than `Require all denied`, for the same reason
+  # ServerSignature is gone: Require comes from mod_authz_core, which this host
+  # does not list among the directives it supports.
+  #
+  # `productionBrowserSourceMaps` is off, so a .map should never reach out/ in
+  # the first place. This is the second lock: turning that flag on for one
+  # debugging session, or a build tool changing its default, would otherwise
+  # publish readable sources — and nobody notices a file that only ever loads
+  # when devtools are open.
+  RewriteRule (^|/)\. - [F,L]
+  RewriteRule \.(map|bak|old|orig|swp|log|sql|zip|tar|gz|env)$ - [F,L]
+</IfModule>
+
+# ── Security headers ─────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+
+  # HSTS. One year, subdomains included.
+  #
+  # NOT preloaded on purpose: preload is a browser-baked, hard-to-reverse
+  # commitment that every subdomain will be HTTPS forever, and it should be
+  # opted into deliberately once the domain has been stable on TLS for a while.
+  # Add `; preload` and submit to hstspreload.org when that is true.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # ── Content Security Policy ────────────────────────────────────────────────
+  #
+  # Everything this site needs is served from its own origin: the fonts are
+  # self-hosted by next/font at build time, there is no analytics script, no
+  # embedded video, no CDN and no API call. That is what makes a policy this
+  # tight possible, and it is worth keeping that way.
+  #
+  # `'unsafe-inline'` on script-src is required and cannot currently be removed:
+  # a Next.js static export inlines its bootstrap and hydration payload, and a
+  # nonce cannot be generated per request when there is no server generating the
+  # response. There is no external script origin allowed, so the realistic
+  # attack this leaves open is reflected injection — and every page here is
+  # static HTML with no user input rendered into it.
+  #
+  # `'unsafe-inline'` on style-src covers React's inline `style` attributes.
+  #
+  # `script-src-attr 'none'` is the part worth pointing at. script-src has to
+  # keep 'unsafe-inline' for the bootstrap above, and that would otherwise also
+  # permit inline event handlers — `onclick="..."`, `onerror="..."` — which is
+  # the shape almost every injected payload takes. Splitting the directive keeps
+  # Next's inline <script> blocks working while making the attribute form
+  # unusable. Nothing on this site uses one; a CSP3 browser now enforces that,
+  # and an older one falls back to script-src exactly as before.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+
+  # Never let a browser guess a type it was not given.
+  Header always set X-Content-Type-Options "nosniff"
+
+  # frame-ancestors above is the modern rule; this is for old browsers that
+  # only understand the legacy header.
+  Header always set X-Frame-Options "DENY"
+
+  # Send the origin cross-site, the full URL same-site, and nothing at all when
+  # downgrading to HTTP.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # A marketing site needs none of these. Denying them means an injected script
+  # could not reach them either.
+  Header always set Permissions-Policy "accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), interest-cohort=()"
+
+  # Process isolation: a document opened from here cannot reach back into this
+  # one, and other origins cannot embed this site's resources.
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+
+  # Nothing here is a legacy Flash/Silverlight policy target.
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+
+  # Ask the browser for a dedicated agent cluster, so this origin does not share
+  # a process with same-site documents it has nothing to do with.
+  Header always set Origin-Agent-Cluster "?1"
+
+  # poweredByHeader is already off in next.config.mjs, but that only governs
+  # what Next emits — a PHP or CGI handler enabled on shared hosting adds its
+  # own. Unset it at the door rather than trusting the host's defaults.
+  Header always unset X-Powered-By
+</IfModule>
+
+# ── Custom 404 (the export emits 404.html from app/not-found.js) ─────────────
+ErrorDocument 404 /404.html
+
+# ── Compression ──────────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml \
+    application/javascript application/json application/xml image/svg+xml \
+    application/rss+xml font/ttf font/otf
+</IfModule>
+
+# ── Caching ──────────────────────────────────────────────────────────────────
+# Two different lifetimes, and the distinction matters.
+#
+# Everything under /_next/static/ carries a content hash in its filename, so a
+# changed file is a different URL and the old one can never be wrong — those get
+# a year, immutable, with no revalidation at all.
+#
+# Everything in public/ (the logo, the screenshots) keeps its filename across
+# deploys. Marking those immutable is how you replace a screenshot and then
+# spend an afternoon wondering why the old one is still on screen. They get a
+# day, which is short enough that a swap appears on its own and long enough that
+# a returning visitor does not re-download every screenshot.
+# SetEnvIf is mod_setenvif, which the host does not name in its supported list.
+# Guarded, so an absent module simply means the branch below never fires:
+# hashed assets fall back to the one-day rule instead of a year — slower, not
+# broken. Unguarded it would risk a 500 on every request.
+<IfModule mod_setenvif.c>
+  SetEnvIf Request_URI "^/_next/static/" IMMUTABLE_ASSET=1
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=31536000, immutable" env=IMMUTABLE_ASSET
+
+  <FilesMatch "\.(png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf)$">
+    Header set Cache-Control "public, max-age=86400" env=!IMMUTABLE_ASSET
+  </FilesMatch>
+
+  # HTML must revalidate, or a deploy is invisible until every visitor's cache
+  # happens to expire on its own.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  <FilesMatch "^(sitemap\.xml|robots\.txt)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+</IfModule>
+
+# ── Correct types for anything the host does not know about ─────────────────
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/avif .avif
+  AddType font/woff2 .woff2
+</IfModule>

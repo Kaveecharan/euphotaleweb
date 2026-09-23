@@ -1,0 +1,369 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EuphoTale — base layer.
+
+   Only three things belong in this file:
+     1. tokens that CSS needs and Tailwind cannot express (the two font vars),
+     2. element defaults that would otherwise be repeated on every page,
+     3. the handful of component classes used often enough that a utility
+        string would be copied rather than reused.
+
+   Everything else is a Tailwind token. If a colour appears here as a literal,
+   it is because a media query or a pseudo-element needs it — never because a
+   component was easier to write that way.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  :root {
+    /* Mirrors tailwind.config.js. Kept in sync by hand, and used only where a
+       raw CSS value is unavoidable (gradients, ::selection, scrollbars). */
+    --page:   #f4f5f7;
+    --well:   #eaecef;
+    --raised: #ffffff;
+    --ink:    #111417;
+    --ink-body: #2b3036;
+    --ink-mute: #5c646d;
+    --accent: #e8252c;
+    --hair:   rgba(17, 20, 24, 0.07);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* The sticky header is 64px; without this, every in-page anchor lands
+       with its heading tucked underneath it. */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--page);
+    color: var(--ink-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* EuphoTale is a light-surface product and the site commits to that, so the
+       page never inherits a dark UA background on an OS in dark mode. */
+    color-scheme: light;
+  }
+
+  /* Headings carry ink and tight leading; the FAMILY is chosen per element by
+     the component, because only the large editorial ones take the serif. */
+  h1, h2, h3, h4 {
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: rgba(232, 37, 44, 0.16);
+    color: var(--ink);
+  }
+
+  /* A focus ring that is always visible against both the paper and the night
+     sections. Keyboard users get this on every interactive element; pointer
+     users never see it. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--page); }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(17, 20, 24, 0.16);
+    border: 3px solid var(--page);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(17, 20, 24, 0.28); }
+
+  /* Motion here is decoration and nothing else — the scroll reveal, and the
+     hero reel at the bottom of this file — so switching it off costs the reader
+     nothing and honours the setting properly rather than merely shortening it.
+     The reel goes further and is not DECLARED at all under reduced motion, so
+     it settles on its own first frame rather than on whatever it happened to
+     be showing. */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* ── Buttons ──────────────────────────────────────────────────────────────
+     Three of them, and no more. A fourth button style is almost always a sign
+     that a page wanted a different HIERARCHY, not a different colour. */
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill
+           font-sans font-semibold text-[0.9375rem] leading-none
+           px-6 py-3.5 transition-colors duration-200
+           disabled:opacity-55 disabled:pointer-events-none;
+  }
+
+  /* One flat fill. `accent-solid` rather than `accent` because this carries a
+     white LABEL: 5.03:1 clears AA, where the brighter mark colour does not. */
+  .btn-primary {
+    @apply btn bg-accent-solid text-white hover:bg-accent-deep;
+  }
+
+  .btn-secondary {
+    @apply btn bg-raised text-ink border border-hair hover:bg-well;
+  }
+
+  /* For the night sections, where a white fill would shout. */
+  .btn-ghost-night {
+    @apply btn bg-white/[0.06] text-white border border-night hover:bg-white/[0.12];
+  }
+
+  /* ── Surfaces ─────────────────────────────────────────────────────────────
+     A card is a white surface on grey paper. The tonal step IS the hierarchy,
+     so the hairline is optional and the shadow stays almost invisible. */
+  .card {
+    @apply bg-raised rounded-card border border-hair;
+  }
+
+  /* ── The eyebrow ──────────────────────────────────────────────────────────
+     Small, wide-tracked, and the one place the accent appears as text at a
+     small size — which is why it uses `deep` (5.71:1 on the page) rather than
+     the brighter mark colour. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-sans text-[0.6875rem] font-semibold
+           uppercase tracking-[0.16em] text-accent-deep;
+  }
+
+  /* ── Editorial headline ───────────────────────────────────────────────────
+     The serif, used large. Below about 28px it loses the quality that earns it
+     a place here, so it is never applied to small text. */
+  .headline {
+    @apply font-display font-normal text-ink leading-[1.06] tracking-[-0.015em];
+  }
+}
+
+/* Declared here rather than left to Tailwind's `keyframes` config: Tailwind
+   only emits a keyframes block when the matching `animate-*` utility appears in
+   the scanned source, and the reveal below references `rise` from raw CSS. */
+@keyframes rise {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@layer utilities {
+  /* Content that must not stretch into an unreadable line length. */
+  .measure { max-width: 68ch; }
+
+  /* The soft page wash behind the hero and the closing CTA. Two very low
+     opacity radial tints — no filter: blur(), which is a full-screen GPU pass
+     on every scroll frame and the usual reason a landing page janks. */
+  .wash {
+    background-image:
+      radial-gradient(60rem 40rem at 78% -10%, rgba(232, 37, 44, 0.05), transparent 60%),
+      radial-gradient(48rem 34rem at 8% 30%, rgba(17, 20, 24, 0.045), transparent 62%);
+  }
+
+  /* ── Scroll reveal, with no JavaScript at all ───────────────────────────────
+     The usual implementation is an IntersectionObserver that animates opacity
+     from 0 to 1 — which means the server ships content at opacity 0, and
+     anything that stops the observer running (a script error, a bfcache
+     restore, a crawler with no scripting) leaves the page permanently blank.
+     That failure mode is not worth a fade.
+
+     This is a scroll-driven CSS animation instead. The element is VISIBLE by
+     default and the animation is only attached where the browser supports
+     `animation-timeline`, so every other browser simply shows the content.
+     Reduced motion opts out for the same reason. Zero bytes of JavaScript, and
+     no way for it to hide anything. */
+  .reveal { opacity: 1; }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% entry 60%;
+      }
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   The hero reel — components/HeroReel.jsx
+
+   The phone at the top of the page plays a short loop of somebody using the
+   app: two moments swiped through, the feed scrolled to the journal entry
+   under it, then across to the companion and down to its last message. Then it
+   comes back to the feed, plays the whole thing once more, and stops there.
+
+   ── One clock ──────────────────────────────────────────────────────────────
+
+   Nine animations, one duration, and every beat written as a PERCENTAGE of it.
+   That is the whole reason the beats stay locked together — the moment switch
+   has to move the ring in the strip, the date under it, the header's timestamp,
+   the moment's words and the dot indicator on the same frame, and five
+   independently-timed animations would drift the first time one was nudged.
+   Retiming the reel is one number, --reel-t.
+
+   The beats, in seconds at 14s:
+
+     0.60  hold       1.05   swipe → Jan 18's second photograph
+     1.70  hold       2.15   swipe → its third
+     2.85  hold       3.40   back to Nov 2: its photographs cross-fade in, and
+                             the ring, date, words, time and dots go with them
+     4.10  hold       4.55   swipe → Nov 2's second photograph
+     5.40  hold       6.35   scroll: the journal entry comes to the top
+     7.30  hold       7.95   the home screen leaves to the left
+     8.45  hold      10.65   the thread scrolls down to the last message
+    10.65  rest      12.60   it sits on that line
+    12.60  return    13.30   the home screen comes back
+    13.30  hold      14.00   and that is where the second play ends
+
+   ── Why it ends where it starts ────────────────────────────────────────────
+
+   Every animation's 100% keyframe is identical to its 0% keyframe, which buys
+   two things at once. The join between the two plays is seamless — nothing
+   snaps back, because the reel has already walked home under its own power —
+   and `forwards` on the last iteration lands on the feed, at the top, on Jan
+   18's first photograph. That final still is the same frame reduced motion
+   gets, and the same frame this reel replaced.
+
+   The resets that CANNOT be walked — the feed's scroll position, which moment
+   is open, where each carousel is parked — all happen between 80% and 84%,
+   while the home screen is off to the left and nobody can see them. The chat
+   rewinds later still, at 96%, once it is off the right edge.
+
+   ── Two measurements ───────────────────────────────────────────────────────
+
+   --reel-post is the height of the memory post, so it is both the box that
+   post is drawn in and the distance the column travels. Declaring it here
+   rather than in the JSX keeps the two from ever disagreeing.
+
+   --reel-chat is how far up the thread starts. Enough to hide the last few
+   messages, so scrolling down to them is a real arrival.
+
+   ── Why percentages and not nine separate delays ───────────────────────────
+
+   An `animation-delay` chain would express the same thing and break the same
+   way: each beat's start would depend on the sum of everything before it, so
+   lengthening one swipe would mean editing eight other numbers. Here a beat is
+   two percentages and knows nothing about its neighbours.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* One play. 14s ran the first two photographs past in about six tenths of a
+     second each, which is long enough to register that something moved and not
+     long enough to see what it was. 18s gives each one closer to eight tenths
+     — the same reel, read rather than glimpsed — and matches the app's own
+     PLAY_MS, so the two tell the story at one pace.
+
+     Every beat below is a percentage of this, so changing it stretches the
+     swipes, the holds and both scrolls together. Nothing else needs touching. */
+  --reel-t: 18s;
+
+  /* How many times it runs before settling on the feed. */
+  --reel-plays: 2;
+
+  --reel-post: 424px;
+  --reel-chat: 140px;
+
+  /* A flick that leaves fast and lands soft — the curve a paged carousel
+     settles on, and the reason the swipes read as a thumb rather than as a
+     slideshow advancing. */
+  --reel-flick: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* The states these classes animate BETWEEN are also their resting states, so
+   the frame is complete and correct with every animation below removed: Jan 18
+   open on its first photograph, the feed at the top, the companion off to the
+   right with its newest message showing. Only the `b` half needs saying. */
+.reel-b {
+  opacity: 0;
+}
+
+/* One carousel per moment, cross-faded, because a swipe and a change of moment
+   are different gestures and must not look like the same one. Each track is as
+   many screens wide as the moment has photographs, so one screen is 1/n of it.
+
+   Jan 18: three photographs, two swipes. */
+@keyframes reelGalA {
+  0%,      4.29%  { transform: translate3d(0, 0, 0); }
+  7.5%,   12.14%  { transform: translate3d(-33.3333%, 0, 0); }
+  15.36%,    80%  { transform: translate3d(-66.6667%, 0, 0); }
+  84%,      100%  { transform: translate3d(0, 0, 0); }
+}
+
+/* Nov 2: two photographs, one swipe — and it enters a few pixels left of where
+   it settles, because it sits to the LEFT in the strip. Three percent of a
+   two-wide track is six percent of a screen: enough to carry a direction,
+   nowhere near enough to read as a swipe of its own. */
+@keyframes reelGalB {
+  0%,     20.36%  { transform: translate3d(-3%, 0, 0); }
+  24.29%, 29.29%  { transform: translate3d(0, 0, 0); }
+  32.5%,     80%  { transform: translate3d(-50%, 0, 0); }
+  84%,      100%  { transform: translate3d(-3%, 0, 0); }
+}
+
+/* The active pip, sliding along a 9px pitch: a 5px dot plus a 4px gap. */
+@keyframes reelDotsA {
+  0%,      4.29%  { transform: translate3d(0, 0, 0); }
+  7.5%,   12.14%  { transform: translate3d(9px, 0, 0); }
+  15.36%,    80%  { transform: translate3d(18px, 0, 0); }
+  84%,      100%  { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes reelDotsB {
+  0%,     29.29%  { transform: translate3d(0, 0, 0); }
+  32.5%,     80%  { transform: translate3d(9px, 0, 0); }
+  84%,      100%  { transform: translate3d(0, 0, 0); }
+}
+
+/* Everything that belongs to one moment or the other. One pair of keyframes
+   drives the ring, the date, the words and the header's time together. */
+@keyframes reelSwapA {
+  0%,     20.36%  { opacity: 1; }
+  24.29%,    80%  { opacity: 0; }
+  84%,      100%  { opacity: 1; }
+}
+
+@keyframes reelSwapB {
+  0%,     20.36%  { opacity: 0; }
+  24.29%,    80%  { opacity: 1; }
+  84%,      100%  { opacity: 0; }
+}
+
+@keyframes reelFeed {
+  0%,     38.57%  { transform: translate3d(0, 0, 0); }
+  45.36%,    80%  { transform: translate3d(0, calc(-1 * var(--reel-post)), 0); }
+  84%,      100%  { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes reelSlide {
+  0%,     52.14%  { transform: translate3d(0, 0, 0); }
+  56.79%,    90%  { transform: translate3d(-50%, 0, 0); }
+  95%,      100%  { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes reelChat {
+  0%,     60.36%  { transform: translate3d(0, var(--reel-chat), 0); }
+  76.07%,    96%  { transform: translate3d(0, 0, 0); }
+  99%,      100%  { transform: translate3d(0, var(--reel-chat), 0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reel-slide   { animation: reelSlide var(--reel-t) var(--reel-flick) var(--reel-plays) forwards; }
+  .reel-gal-a   { animation: reelGalA  var(--reel-t) var(--reel-flick) var(--reel-plays) forwards; }
+  .reel-gal-b   { animation: reelGalB  var(--reel-t) var(--reel-flick) var(--reel-plays) forwards; }
+  .reel-pill-a  { animation: reelDotsA var(--reel-t) var(--reel-flick) var(--reel-plays) forwards; }
+  .reel-pill-b  { animation: reelDotsB var(--reel-t) var(--reel-flick) var(--reel-plays) forwards; }
+  .reel-a       { animation: reelSwapA var(--reel-t) ease-in-out       var(--reel-plays) forwards; }
+  .reel-b       { animation: reelSwapB var(--reel-t) ease-in-out       var(--reel-plays) forwards; }
+
+  /* Both scrolls are read rather than flicked, so they take a gentler curve
+     than the swipes: content the eye has to follow, not a page turning. */
+  .reel-feed { animation: reelFeed var(--reel-t) cubic-bezier(0.4, 0, 0.2, 1) var(--reel-plays) forwards; }
+  .reel-chat { animation: reelChat var(--reel-t) cubic-bezier(0.33, 0, 0.2, 1) var(--reel-plays) forwards; }
+}
