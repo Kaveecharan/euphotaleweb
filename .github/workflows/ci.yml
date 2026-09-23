@@ -1,0 +1,85 @@
+# ═════════════════════════════════════════════════════════════════════════════
+#  CI — build the marketing site and check the export is complete.
+#
+#  The GATE half of CI/CD. IONOS Deploy Now generates its own workflow beside
+#  this one when you connect the project and REGENERATES it whenever project
+#  settings change — so checks belong here, in a file IONOS does not own.
+#
+#  The failure this exists for is specific and quiet: a green build that
+#  publishes nothing, or publishes a site missing the pages the phone app links
+#  to. Both look fine in the Actions log.
+# ═════════════════════════════════════════════════════════════════════════════
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Marketing site
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Plain `npm run build`, never with NEXT_DIST_DIR set. With
+      # output:'export' that variable moves the export INTO distDir and produces
+      # no out/ at all — so the deploy uploads nothing and the site is empty,
+      # with a green build and no error anywhere. See next.config.mjs.
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_DIST_DIR: ''
+
+      - name: Audit dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: The export produced a site
+        run: |
+          test -f out/index.html \
+            || { echo "::error::out/index.html missing — the static export did not run. Check NEXT_DIST_DIR is unset."; exit 1; }
+          test -f out/.htaccess \
+            || { echo "::error::out/.htaccess missing — it is copied from public/. Without it the site has no security headers and no HTTPS redirect."; exit 1; }
+
+      # trailingSlash: true means each route is a directory with its own
+      # index.html. A missing one is a 404 on a link already shipped to users —
+      # the app and both store listings point at the legal pages.
+      - name: Every route the app links to exists
+        run: |
+          for page in about terms privacy-policy delete-account; do
+            test -f "out/$page/index.html" \
+              || { echo "::error::out/$page/index.html missing — the app links to /$page."; exit 1; }
+          done
+
+      - name: The security headers made it into the export
+        run: |
+          grep -q 'Content-Security-Policy' out/.htaccess \
+            || { echo "::error::out/.htaccess sends no CSP."; exit 1; }
+          grep -q 'Strict-Transport-Security' out/.htaccess \
+            || { echo "::error::out/.htaccess sends no HSTS."; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-out
+          path: out
+          retention-days: 7
