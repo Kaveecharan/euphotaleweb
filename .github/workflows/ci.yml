@@ -36,7 +36,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          # Reads .node-version. Next 15.5 needs >=18.18 and Cloudflare Pages
+          # defaults below that, so an unpinned build fails on Pages.
+          node-version-file: .node-version
           cache: npm
 
       - name: Install
@@ -69,6 +71,18 @@ jobs:
           for page in about terms privacy-policy delete-account; do
             test -f "out/$page/index.html" \
               || { echo "::error::out/$page/index.html missing — the app links to /$page."; exit 1; }
+          done
+
+      # Cloudflare Pages reads _headers and ignores .htaccess entirely. Without
+      # it a Pages deployment of this site sends no security headers at all
+      # while looking perfectly deployed.
+      - name: Both host configs made it into the export
+        run: |
+          test -f out/_headers \
+            || { echo "::error::out/_headers missing — on Cloudflare Pages this site would send NO security headers. It is copied from public/."; exit 1; }
+          for h in Content-Security-Policy Strict-Transport-Security X-Frame-Options; do
+            grep -q "$h" out/_headers \
+              || { echo "::error::out/_headers is missing $h."; exit 1; }
           done
 
       - name: The security headers made it into the export

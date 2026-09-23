@@ -1,0 +1,41 @@
+# ═════════════════════════════════════════════════════════════════════════════
+#  Security headers for Cloudflare Pages.
+#
+#  The companion to public/.htaccess, which Apache (IONOS) reads and Pages
+#  ignores completely. Without this file a Pages deployment of this site sends
+#  NO security headers at all — no CSP, no HSTS, no frame-ancestors — while
+#  looking perfectly deployed.
+#
+#  Next copies everything in public/ into out/ verbatim during the static
+#  export, so this ships with the site.
+#
+#  ── Keep this in step with public/.htaccess ─────────────────────────────────
+#  Unlike the admin console, whose two configs are GENERATED from one object in
+#  csp.js and therefore cannot drift, this pair is maintained by hand. If you
+#  change a header, change it in both files. The CI workflow asserts both exist
+#  and both carry a CSP and HSTS, which catches a deleted file but not a value
+#  that was edited in only one of them.
+# ═════════════════════════════════════════════════════════════════════════════
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
+  Origin-Agent-Cluster: ?1
+
+# Next's build output is content-hashed, so the URL changes whenever the bytes
+# do and an old one can never be wrong.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The HTML keeps its path across every deploy, so it must revalidate or a
+# visitor stays pinned to the build they first saw. Short, not no-store: this is
+# a public marketing site and edge caching is worth having.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
