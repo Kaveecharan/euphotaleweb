@@ -121,7 +121,9 @@ export default function TermsPage() {
           everything else to say it.
         </p>
         <p>
-          If the companion ever says something harmful, offensive or plainly wrong about you, tell us
+          If the companion ever says something harmful, offensive or plainly wrong about you, tap{' '}
+          <strong className="font-semibold text-ink">Report</strong> under the reply — it opens a
+          report to us with the reply already quoted, without leaving the app — or write to us
           at{' '}
           <a
             className="font-medium text-accent-deep underline underline-offset-4"
@@ -129,8 +131,8 @@ export default function TermsPage() {
           >
             {BRAND.supportEmail}
           </a>
-          . Quote the reply. Companion output is private to your conversation, so it is never
-          reported by anyone else on your behalf — if you do not tell us, nobody can.
+          . Companion output is private to your conversation, so it is never reported by anyone else
+          on your behalf — if you do not tell us, nobody can.
         </p>
       </Clause>
 

@@ -47,8 +47,9 @@ export default function PrivacyPolicyPage() {
           emotion ratings you attach to journal entries or memories.
         </Term>
         <Term label="Companion conversations">
-          What you say to your companion, its replies, and the understanding built from them: short
-          statements about your life, each linked to the words of yours it came from.
+          What you say to your companion — typed, or spoken and turned into text — its replies, and
+          the understanding built from them: short statements about your life, each linked to the
+          words of yours it came from.
         </Term>
         <Term label="Verification">
           If you are asked to confirm you are a real person, the selfie you submit and the outcome of
@@ -90,7 +91,7 @@ export default function PrivacyPolicyPage() {
         <List
           items={[
             'No precise location. We never ask for GPS. Your approximate country is inferred from your IP address for currency and legal purposes, and that is the extent of it.',
-            'No contact list, no photo library scanning, and no microphone access outside a voice note you deliberately record.',
+            'No contact list, no photo library scanning, and no microphone access outside a voice note or spoken message you deliberately record.',
             'No data brokers. Nothing you write, post or record is sold, and no advertising profile is built from the content of your memories, journals or messages.',
             'No biometric identifiers. A verification selfie is looked at by a person and deleted; no faceprint or template is computed from it, and it is never used to identify you again.',
             'No profile of anyone who does not have an account.',
@@ -132,8 +133,15 @@ export default function PrivacyPolicyPage() {
           </strong>{' '}
           To generate a reply, the relevant part of your conversation and the memory it draws on are
           sent to OpenAI, which processes them on our behalf under its API terms and does not use
-          them to train its models. Nothing about your companion is shown to other users, posted
-          anywhere, or used to target advertising.
+          them to train its models. OpenAI also turns a spoken message into text, and reads the
+          note on a daily check-in so your companion can remember how your day went. Nothing about
+          your companion is shown to other users, posted anywhere, or used to target advertising.
+        </p>
+        <p>
+          <strong className="font-semibold text-ink">None of this happens until you agree.</strong>{' '}
+          The first time you open the companion, the app tells you what is sent to OpenAI and asks
+          for your permission. Until you give it, nothing you write, say or record — including
+          check-in notes — is sent.
         </p>
         <p>
           You can delete any conversation from inside the app. Deleting your account removes your
@@ -143,9 +151,10 @@ export default function PrivacyPolicyPage() {
 
       <Clause id="advertising" title="5. Advertising and interest profiling">
         <p>
-          The free plan shows ads. Pro removes them entirely. Advertising here is first-party and
-          on-platform: interests are inferred only from what you do inside {BRAND.name} — the tags on
-          things you like, save, repost, comment on or search for.
+          The free plan shows ads, served by Google AdMob as described in section 1. Pro removes them
+          entirely. The interest profile {BRAND.name} itself keeps is first-party and on-platform:
+          interests are inferred only from what you do inside {BRAND.name} — the tags on things you
+          like, save, repost, comment on or search for — and none of it is passed to Google.
         </p>
         <p>What this never involves, at any point:</p>
         <List
@@ -161,9 +170,12 @@ export default function PrivacyPolicyPage() {
         <p>
           Personalised advertising is opt-in wherever consent is legally required, and can be
           switched off everywhere else, from Settings → Ad preferences. Turning it off does not
-          remove ads on the free plan; it makes them non-personalised. Advertisers never receive your
-          identity — targeting only reaches groups above a minimum size, so a single person can never
-          be singled out.
+          remove ads on the free plan; it makes them non-personalised, including the ads Google
+          serves. Accounts under 18, or without a verified date of birth, only ever receive
+          non-personalised ads. Where Google&rsquo;s consent form applies, you can review or change
+          your choices on it from the same screen. Advertisers never receive your identity —
+          targeting only reaches groups above a minimum size, so a single person can never be
+          singled out.
         </p>
       </Clause>
 
@@ -177,7 +189,7 @@ export default function PrivacyPolicyPage() {
             'Stripe — payments, subscriptions and card handling on the web.',
             'Apple and Google — payments and subscriptions bought inside the mobile apps, which the app stores require to be handled by them.',
             'Google AdMob — serving ads on the free plan.',
-            'OpenAI — generating companion replies and the memory derived from them.',
+            'OpenAI — generating companion replies, transcribing spoken messages, and the memory derived from them — only once you have agreed in the app.',
             'Cloudflare (R2) — storing and delivering photos, video and voice notes.',
             'Cloudinary — holding a verification selfie privately until it has been reviewed and deleted.',
             'Brevo — transactional email such as verification codes and billing notices.',
@@ -187,8 +199,9 @@ export default function PrivacyPolicyPage() {
           ]}
         />
         <p>
-          We do not sell your personal information, and we do not share it with data brokers or
-          advertising networks. We disclose data to authorities only where legally compelled, and we
+          We do not sell your personal information, and we do not share it with data brokers.
+          Apart from Google AdMob on the free plan, as described in section 1, we do not share it
+          with advertising networks. We disclose data to authorities only where legally compelled, and we
           look at whether the demand is valid before we do.
         </p>
       </Clause>
