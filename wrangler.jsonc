@@ -1,0 +1,21 @@
+// Cloudflare Workers deploy for the marketing site: static assets only, no
+// Worker script.
+//
+// Without this file `wrangler deploy` falls back to auto-configuration, which
+// treats a Next.js repo as a server app and tries to convert it. This site is
+// a static export (next.config.mjs: output 'export'), so the deploy only has
+// to upload out/.
+//
+// `name` is overridden by Workers Builds to match the Worker it is connected
+// to, so a different name in the dashboard is fine.
+{
+  "name": "euphotale-web",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./out",
+    // A multi-page site, not an SPA: an unknown path gets out/404.html with a
+    // real 404. /about redirects to /about/ (trailingSlash: true) by default.
+    // out/_headers (copied from public/) carries the security headers.
+    "not_found_handling": "404-page"
+  }
+}
