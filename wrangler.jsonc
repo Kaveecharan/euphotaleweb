@@ -6,10 +6,10 @@
 // a static export (next.config.mjs: output 'export'), so the deploy only has
 // to upload out/.
 //
-// `name` is overridden by Workers Builds to match the Worker it is connected
-// to, so a different name in the dashboard is fine.
+// `name` matches the Worker in the dashboard (Workers Builds names it after
+// the repo). Workers Builds overrides a mismatch, but warns and opens a PR.
 {
-  "name": "euphotale-web",
+  "name": "euphotaleweb",
   "compatibility_date": "2026-09-01",
   "assets": {
     "directory": "./out",
