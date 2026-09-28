@@ -59,8 +59,8 @@ export default function DeleteAccountPage() {
           account without also holding the mailbox.
         </p>
         <p>
-          You do not need to contact us, and you do not need to cancel your subscription first — see
-          clause 6.
+          You do not need to contact us. If you pay for Pro through the App Store or Google Play,
+          cancel it there first — see clause 6.
         </p>
       </Clause>
 
@@ -140,9 +140,16 @@ export default function DeleteAccountPage() {
 
       <Clause id="subscription" title="6. If you have a Pro subscription">
         <p>
-          Deleting your account ends the subscription — you are not left paying for an account that
-          no longer exists. Deletion does not refund the period you have already paid for; if you
-          want to use Pro until the end of it, cancel first and delete when it lapses.
+          A subscription bought in the app is billed by the App Store or Google Play, not by{' '}
+          {BRAND.name}, and{' '}
+          <strong className="font-semibold text-ink">deleting your account does not cancel it</strong>
+          . Cancel it first in your App Store or Google Play subscription settings, or the store will
+          keep charging you. The app reminds you of this before you delete. A subscription bought
+          from us directly on the web ends with the account.
+        </p>
+        <p>
+          Deletion does not refund the period you have already paid for; if you want to use Pro until
+          the end of it, cancel first and delete when it lapses.
         </p>
         <p>
           Any AI top-up credit balance is lost on deletion. Credits are attached to the account, and

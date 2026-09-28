@@ -78,7 +78,10 @@ export default function TermsPage() {
             There is no tolerance for objectionable content or abusive users.
           </strong>{' '}
           Content can be reported from anywhere it appears, in twelve categories, and any account can
-          be blocked, muted or hidden by you directly and immediately.
+          be blocked, muted or hidden by you directly and immediately. Captions, titles, comments,
+          bios and names are also checked automatically before they are posted, and anything
+          containing a hateful slur or language used to trade sexual material involving children is
+          refused. That check runs on our own servers; nothing you write is sent anywhere for it.
         </p>
         <p>
           Reports are read by a person, not decided by a machine. Child safety, threats to life and
