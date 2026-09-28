@@ -34,8 +34,9 @@ export default function TermsPage() {
         </p>
         <p>
           One person, one account. You are responsible for keeping your password and your device
-          secure, and for everything done through your account. Nobody under 18 is shown
-          personalised advertising or included in any interest profile, whatever they engage with.
+          secure, and for everything done through your account. The app asks your date of birth
+          once; it must be your real one, and it can only be corrected afterwards through support.
+          Nobody under 18 is shown personalised advertising, whatever they engage with.
         </p>
         <p>
           If we learn that an account belongs to someone below the minimum age, we remove it.

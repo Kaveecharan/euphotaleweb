@@ -115,7 +115,7 @@ export default function DeleteAccountPage() {
             'Your companion conversations and the entire memory built from them.',
             'Your direct messages, comments, likes, saves, reposts and follows.',
             'Your Moon level and its history.',
-            'Your interest profile and every advertising preference attached to it.',
+            'Your date of birth and every advertising preference attached to your account.',
             'Any verification selfie still awaiting review.',
           ]}
         />

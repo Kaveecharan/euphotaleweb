@@ -13,7 +13,7 @@ export const metadata = {
  *
  * Written against what the product ACTUALLY does, clause by clause: the
  * companion's permanent memory, the processors that see your data, the
- * consent-based interest profiling and the categories it can never infer.
+ * advertising choices and exactly who may be shown a personalised ad.
  *
  * Two disclosures here are the ones a generic template always omits and a
  * regulator always asks about — that companion conversations are processed by
@@ -31,8 +31,11 @@ export default function PrivacyPolicyPage() {
     >
       <Clause id="what-we-collect" title="1. What we collect">
         <Term label="Account information">
-          Your name, username, email address and a hashed password. Optionally a phone number,
-          profile photo, bio and date of birth. If you sign in with Google we receive your name,
+          Your name, username, email address, date of birth and a hashed password. Optionally a
+          phone number, profile photo and bio. The app asks your date of birth once, before it can
+          be used, to apply the minimum age and to decide which kind of ads your account may see. It
+          is not shown on your profile, and it can only be corrected afterwards by writing to
+          support. If you sign in with Google we receive your name,
           email address and profile picture from that sign-in — never your Google password. If you
           sign in with Apple we receive the name and email address you choose to share, which may be
           a private relay address Apple creates for you — never your Apple ID password.
@@ -76,10 +79,11 @@ export default function PrivacyPolicyPage() {
           {BRAND.name} does not receive that identifier and does not build an advertising profile
           from anything you write, post or record.
           {' '}
-          You are asked before this begins: in the UK and EU a consent form appears first, and on
-          iOS the system tracking prompt appears as well. Declining keeps the ads non-personalised
-          and changes nothing else about the app. Pro accounts are ad-free, and the advertising SDK
-          is never started for them at all.
+          Personalised ads are only ever shown to accounts aged 18 or over. Where your consent is
+          needed first — in the UK, the EU and US states with a right to opt out, Google&rsquo;s
+          consent form, and on iPhone, Apple&rsquo;s tracking prompt — you are asked before it
+          begins. Declining keeps the ads non-personalised and changes nothing else about the app.
+          Pro accounts are ad-free, and the advertising SDK is never started for them at all.
         </Term>
       </Clause>
 
@@ -149,12 +153,13 @@ export default function PrivacyPolicyPage() {
         </p>
       </Clause>
 
-      <Clause id="advertising" title="5. Advertising and interest profiling">
+      <Clause id="advertising" title="5. Advertising">
         <p>
           The free plan shows ads, served by Google AdMob as described in section 1. Pro removes them
-          entirely. The interest profile {BRAND.name} itself keeps is first-party and on-platform:
-          interests are inferred only from what you do inside {BRAND.name} — the tags on things you
-          like, save, repost, comment on or search for — and none of it is passed to Google.
+          entirely. {BRAND.name} does not build an advertising or interest profile of its own. With
+          each ad request the app tells Google only two things about you: whether the ad may be
+          personalised, and whether your account is under 16 — so that Google treats it as the
+          account of someone under the age of consent.
         </p>
         <p>What this never involves, at any point:</p>
         <List
@@ -162,20 +167,20 @@ export default function PrivacyPolicyPage() {
             'No tracking pixel on other websites and no SDK inside other apps.',
             'No purchase of data about you from data brokers, and no contact-list upload.',
             'No profile of anyone who does not have an account.',
-            'No inference of health, religion, politics, ethnicity, sexuality or trade-union membership — these can never become an interest, whatever you engage with.',
-            'No use of your day logs, emotion ratings, journal entries or companion conversations.',
-            'No interest profiling of anyone under 18. An account with no verified date of birth is treated as under 18.',
+            'No use of your posts, memories, day logs, emotion ratings, journal entries, messages or companion conversations to choose ads.',
+            'No personalised advertising for anyone under 18. An account with no confirmed date of birth is treated as under 18.',
           ]}
         />
         <p>
-          Personalised advertising is opt-in wherever consent is legally required, and can be
-          switched off everywhere else, from Settings → Ad preferences. Turning it off does not
-          remove ads on the free plan; it makes them non-personalised, including the ads Google
-          serves. Accounts under 18, or without a verified date of birth, only ever receive
-          non-personalised ads. Where Google&rsquo;s consent form applies, you can review or change
-          your choices on it from the same screen. Advertisers never receive your identity —
-          targeting only reaches groups above a minimum size, so a single person can never be
-          singled out.
+          For accounts aged 18 or over, personalised ads are on unless you turn them off in
+          Settings → Ad preferences. Where the law requires your consent first, it is Google&rsquo;s
+          consent form that asks, and your answer there decides whether Google may personalise; on
+          iPhone, Apple&rsquo;s tracking prompt does the same. Turning personalised ads off in the
+          app makes every ad non-personalised whatever you chose on those forms, and it stays off
+          until you turn it back on. It does not remove ads on the free plan. The same switch is how
+          you opt out of the &ldquo;sharing&rdquo; of personal information for cross-context
+          behavioural advertising under California and similar US state laws. Where Google&rsquo;s
+          consent form applies, you can review or change your choices on it from the same screen.
         </p>
       </Clause>
 
@@ -213,7 +218,7 @@ export default function PrivacyPolicyPage() {
             'Companion memory is kept for as long as your account exists, so that it can remember you. Individual conversations can be deleted at any time.',
             'Verification selfies are deleted once the review is complete — they are not kept as a record.',
             'Security and sign-in logs are kept for a limited period for abuse investigation, then discarded.',
-            'Interest profiles expire on their own if you stop engaging, and are erased when you delete your account.',
+            'Your date of birth and advertising choice are kept while your account exists, and erased when you delete it.',
             'Deactivating hides your account and keeps your data indefinitely, so you can come back.',
             'Deleting hides your account at once and erases it after a 30-day grace period. Signing back in inside those 30 days cancels the deletion and restores everything; after them it is permanent.',
             'Records we must keep by law — payment and tax records for a completed transaction — are kept for the period the law sets and used for nothing else.',
@@ -284,13 +289,16 @@ export default function PrivacyPolicyPage() {
       <Clause id="children" title="10. Children">
         <p>
           {BRAND.name} is not intended for children under 13, and we do not knowingly create accounts
-          for them. Where the law where you live sets a higher age for consenting to data processing
-          — 16 in several countries — that age applies instead.
+          for them. Everyone is asked their date of birth before they can use the app; an account
+          whose holder gives one under 13 is closed at once and deleted, with everything it holds,
+          30 days later. Where the law where you live sets a higher age for consenting to data
+          processing — 16 in several countries — that age applies instead.
         </p>
         <p>
-          Nobody under 18 is interest-profiled or targeted with personalised advertising, and an
-          account with no verified date of birth is treated as under 18 for that purpose. If you
-          believe a child has an account, write to us and we will remove it and erase what it holds.
+          Nobody under 18 is shown personalised advertising, and an account with no confirmed date
+          of birth is treated as under 18 for that purpose. Ads for accounts under 16 are marked for
+          Google as being for someone under the age of consent. If you believe a child has an
+          account, write to us and we will remove it and erase what it holds.
         </p>
       </Clause>
 
